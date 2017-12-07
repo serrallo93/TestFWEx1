@@ -5,14 +5,19 @@
  *
  * @author Albert Serrallo
  *
- * @date 06/12/2017
+ * @date 07/12/2017
  *
  ****************************************************************************/
 
 
-#ifndef __INGENIAAPI_H__
-#define __INGENIAAPI_H__
+#ifndef __TEST_API_H__
+#define __TEST_API_H__
 
+
+
+/****************************************************************************
+ *    PUBLIC FUNCTIONS
+ ****************************************************************************/
 void RobotTask(uint8_t u8Command);
 void RobotStop (void);
 void TimerInit(void);
@@ -26,4 +31,5 @@ void SPISensorDisable(void);
 uint8_t SPIRead(void);
 
 
-#endif /* __INGENIAAPI_H__ */
+
+#endif /* __TEST_API_H__ */

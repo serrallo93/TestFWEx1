@@ -55,8 +55,8 @@ int main()
 
     while (TRUE)
     {
-    	/* If the robotTask is Enable, we execute as fast as possible, so we
-    	 * put in the infinite loop.
+    	/* If the robotTask is enabled, we execute as fast as possible the next
+    	 * robot task, so we put in the infinite loop
     	 */
     	if (robotTaskEnable == TRUE)
     	{
