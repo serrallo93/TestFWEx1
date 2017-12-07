@@ -13,23 +13,20 @@
 /****************************************************************************
 *  INCLUDES
 ****************************************************************************/
-#include "stdint.h"
+#include "typedef.h"
 #include "main.h"
 #include "TestAPI.h"
 
 /****************************************************************************
  *    DEFINES
  ****************************************************************************/
-#define PERIODIC_TIME_SENSOR_TASK 1000
-#define PERIODIC_TIME_ROBOT_TASK 100000
+
 
 /****************************************************************************
  *    PUBLIC VARIABLE
  ****************************************************************************/
 tBool robotTaskEnable;
 tBool isSpiReady;
-uint32_t timeProcessRobotTask;
-uint32_t timeProcessSensorTask;
 
 /****************************************************************************
  *    PRIVATE FUNCTIONS
@@ -41,7 +38,7 @@ static tBool checkSensorDetected( void );
 /*************************************************************************//**
  * @brief   Embedded application start routine.
  * @param	None
- * @return  None
+ * @return  0
  ****************************************************************************/
 int main()
 {
@@ -49,7 +46,10 @@ int main()
 	robotTaskEnable = TRUE;
 	isSpiReady = TRUE;
 
-	/* Timer and SPI Initialization */
+	/* Timer and SPI Initialization
+	 * TimerInit expend 5ms and SPIInit expends 7ms, but is not problem
+	 * because there are in the Initialization phase.
+	 */
 	TimerInit();
 	SPIInit();
 
@@ -65,6 +65,10 @@ int main()
 				RobotTask(command);
 			}
     	}
+    	else
+    	{
+    		// System Stop state. Nothing to execute
+    	}
     }
 
     return 0;
@@ -73,41 +77,27 @@ int main()
 
 /*************************************************************************//**
 * @brief   Interrupt Timer callback. It is executed every 1 ms. Its read
-*          and check the sensor. It is not the best
-*          way, but we don't know how RobotTask is implemented, so its supposed
-*          that is polling mode and the only way to execute another functionality
-*          is in an interrupt.
+*          and check the sensor. In case that object is detected, we execute
+*          Robot Stop functionality and disable robotTaskEnable to entry in a
+*          system stop state
 ******************************************************************************/
 void TimerISR(void)
 {
-	if (robotTaskEnable == TRUE && checkSensorDetected())
+	if (robotTaskEnable == TRUE)
 	{
-		RobotStop();
-		robotTaskEnable = FALSE;
+		if( checkSensorDetected()== TRUE)
+		{
+			RobotStop();
+			robotTaskEnable = FALSE;
+		}
 	}
 }
 
-
-/*************************************************************************//**
-* @brief   Check if the sensor detects presence, in affirmative case Stops
-*          the Robot and disable the robotTask.
-*
-******************************************************************************/
-void callSensorTask(void)
-{
-	if (checkSensorDetected() == TRUE && robotTaskEnable == TRUE)
-	{
-		RobotStop();
-		robotTaskEnable = FALSE;
-	}
-}
 
 
 /*************************************************************************//**
 * @brief   get the next command task from the EEPROM SPI memory
-*
 * @return  Command
-*
 ******************************************************************************/
 static tError getNextTaskFromEEPROM( uint8_t* command )
 {
@@ -131,15 +121,16 @@ static tError getNextTaskFromEEPROM( uint8_t* command )
 
 /*************************************************************************//**
 * @brief   Check if the sensor detects collision
-*
-* @return  TRUE or FALSE
-*
+* @return  TRUE (Object is detected) or FALSE (Object is NOT detected)
 ******************************************************************************/
 static tBool checkSensorDetected( void )
 {
 	tBool detection = FALSE;
 	uint8_t val;
 
+	/* Is the SPI is Busy for the EEPROM, Disable
+	 * in order to give priority to the Sensor communication.
+	 */
 	if (isSpiReady == FALSE)
 	{
 		SPIEepromDisable();
@@ -156,6 +147,7 @@ static tBool checkSensorDetected( void )
 
 	return detection;
 }
+
 
 /****************************************************************************
  *    End of file

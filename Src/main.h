@@ -12,34 +12,15 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-
-
-typedef char char_t;
-typedef signed char int8_t;
-typedef signed short int16_t;
-
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-
-typedef float float32_t;
-
+/****************************************************************************
+*  INCLUDES
+****************************************************************************/
+#include "typedef.h"
 
 /****************************************************************************
- *    PUBLIC TYPEDEFS
+ *    PUBLIC FUNCTIONS
  ****************************************************************************/
-typedef enum eBool
-{
-	FALSE,
-	TRUE
-} tBool;
-
-
-typedef enum eError
-{
-	RET_OK,
-	RET_FAIL,
-	RET_BUSY,
-} tError;
+int main();
 
 
 #endif
